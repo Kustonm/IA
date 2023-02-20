@@ -117,7 +117,7 @@ def uniformCostSearch(problem):
         if state[0] not in been:
             been.append(state[0])
             x = problem.getSuccessors(state[0])
-            for s in x: 
+            for s in x:
                 if s[0] not in been: movs.update((s[0],state[1]+','+s[1],state[2]+s[2]),state[2]+s[2])
                     
 

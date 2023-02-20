@@ -61,31 +61,58 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    movs = util.Stack()
+    been = []
+    first=(problem.getStartState(),'',0)
+    movs.push(first)
 
+    while not  movs.isEmpty():
+        state = movs.pop()
+        if problem.isGoalState(state[0]):
+            acts = state[1].split(',')
+            acts.pop(0)
+            return acts
+        if state[0] not in been:
+            been.append(state[0])
+            for s in problem.getSuccessors(state[0]): movs.push((s[0],state[1]+','+s[1]))
+    
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    movs = util.Queue()
+    been = []
+    acts= []
+    first=(problem.getStartState(),'',0)
+    movs.push(first)
+
+    while not  movs.isEmpty():
+        state = movs.pop()
+        if problem.isGoalState(state[0]):
+            acts = state[1].split(',')
+            acts.pop(0)
+            return acts
+        if state[0] not in been:
+            been.append(state[0])
+            for s in problem.getSuccessors(state[0]): movs.push((s[0],state[1]+','+s[1]))
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    movs = util.PriorityQueue()
+    been = []
+    acts =[]
+    first=(problem.getStartState(),'',0)
+    movs.push(first,first[2])
+    while not  movs.isEmpty():
+        state = movs.pop()
+        if problem.isGoalState(state[0]):
+            acts = state[1].split(',')
+            acts.pop(0)
+            return acts
+        if state[0] not in been:
+            been.append(state[0])
+            for s in problem.getSuccessors(state[0]): 
+                if s[0] not in been: movs.update((s[0],state[1]+','+s[1],state[2]+s[2]),state[2]+s[2])
 
 def nullHeuristic(state, problem=None):
     """
@@ -97,7 +124,23 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    movs = util.PriorityQueue() 
+    been = []
+    acts =[]
+    first=(problem.getStartState(),'',0)
+    movs.push(first,first[2])
+    while not  movs.isEmpty():
+        state = movs.pop()
+        if problem.isGoalState(state[0]):
+            acts = state[1].split(',')
+            acts.pop(0)
+            return acts
+        if state[0] not in been:
+            been.append(state[0])
+  
+            for s in problem.getSuccessors(state[0]):
+                if s[0] not in been or state[2]+s[2] < state[2]: 
+                    movs.update((s[0],state[1]+','+s[1],state[2]+s[2]+heuristic(s[0],problem)),state[2]+s[2]+heuristic(s[0],problem))
 
 
 # Abbreviations
