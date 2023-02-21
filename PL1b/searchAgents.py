@@ -366,13 +366,13 @@ def cornersHeuristic(state, problem):
     bC = problem.bCorners
     "*** YOUR CODE HERE ***"
     distances = []
-    if state in corners and state not in bC:
-        for d in corners:
-                if not walls[state[0]][state[1]]:
-                    distances.append(abs(state[0]-d[0])+abs(state[1]-d[1]))
+    for d in corners:
+        if d not in bC:
+            if not walls[state[0]][state[1]]:
+                distances.append(abs(state[0]-d[0])+abs(state[1]-d[1]))
     if not distances: return 0
     return min(distances)
-    
+
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
