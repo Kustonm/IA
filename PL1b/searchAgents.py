@@ -276,24 +276,18 @@ class CornersProblem(search.SearchProblem):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         self.costFn = lambda x: 1
+        self._visited, self._visitedlist, self._expanded = {}, [], 0
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.comidaE = [False,False,False,False]
-    
-    def checkC(self,state):
-        if state[0] == self.corners[0]: self.comidaE[0] = True
-        elif state[1] == self.corners[1]: self.comidaE[1] = True
-        elif state[2] == self.corners[2]: self.comidaE[2] = True
-        elif state[3] == self.corners[3]: self.comidaE[3] = True
-        return self.comidaE
+        self.bCorners = set()
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        return (self.startingPosition,'',0,self.comidaE)
+        return self.startingPosition
     
 
     def isGoalState(self, state):
@@ -301,8 +295,12 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        if (state[0] in self.corners)and(state[3] == [True,True,True,True]): return True
-        else: return False
+        if state in self.corners and state not in self.bCorners:
+            self.bCorners.add(state)
+        if len(self.bCorners) ==  4: return True
+        return False
+        #if (state in self.corners)and(self.comidaE =): return True
+        #else: return False
 
     def getSuccessors(self, state):
         """
@@ -314,8 +312,8 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
         successors = []
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -325,7 +323,14 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
                 
             "*** YOUR CODE HERE ***"
-
+            
+            x,y = state
+            dx,dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                nextState = (nextx, nexty)
+                cost = self.costFn(nextState)
+                successors.append( ( nextState, action, cost) )
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -358,13 +363,16 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
+    bC = problem.bCorners
     "*** YOUR CODE HERE ***"
-    manhattanDs = []
-    for x  in corners: # COnseguir un vector con la distanci de mattahan abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-        manhattanDs.append(abs(state[0][0] - x[0]) + abs(state[0][1] - x[1]))
-    return min(manhattanDs) # Default to trivial solution
-
+    distances = []
+    if state in corners and state not in bC:
+        for d in corners:
+                if not walls[state[0]][state[1]]:
+                    distances.append(abs(state[0]-d[0])+abs(state[1]-d[1]))
+    if not distances: return 0
+    return min(distances)
+    
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
@@ -457,6 +465,7 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+
     return 0
 
 class ClosestDotSearchAgent(SearchAgent):
