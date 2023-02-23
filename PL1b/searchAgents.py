@@ -190,7 +190,7 @@ class PositionSearchProblem(search.SearchProblem):
             if not self.walls[nextx][nexty]:
                 nextState = (nextx, nexty)
                 cost = self.costFn(nextState)
-                successors.append( ( nextState, action, cost) )
+                successors.append(( nextState, action, cost))
 
         # Bookkeeping for display purposes
         self._expanded += 1 # DO NOT CHANGE
@@ -295,12 +295,8 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        if state in self.corners and state not in self.bCorners:
-            self.bCorners.add(state)
         if len(self.bCorners) ==  4: return True
         return False
-        #if (state in self.corners)and(self.comidaE =): return True
-        #else: return False
 
     def getSuccessors(self, state):
         """
@@ -323,14 +319,17 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
                 
             "*** YOUR CODE HERE ***"
-            
+
             x,y = state
             dx,dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+            
             if not self.walls[nextx][nexty]:
                 nextState = (nextx, nexty)
+                if nextState in self.corners and nextState not in self.bCorners: self.bCorners.add(nextState)
                 cost = self.costFn(nextState)
-                successors.append( ( nextState, action, cost) )
+                print(self.bCorners)
+                successors.append((nextState, action, cost))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -370,7 +369,7 @@ def cornersHeuristic(state, problem):
         if d not in bC:
             if not walls[state[0]][state[1]]:
                 distances.append(abs(state[0]-d[0])+abs(state[1]-d[1]))
-    if not distances: return 0
+    #if not distances: return 0
     return min(distances)
 
 class AStarCornersAgent(SearchAgent):
