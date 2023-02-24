@@ -92,10 +92,12 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(state[0]):
             acts = state[1].split(',')
             acts.pop(0)
+            print(acts)
             return acts
         if state[0] not in been:
             been.append(state[0])
             for s in problem.getSuccessors(state[0]): movs.push((s[0],state[1]+','+s[1]))
+
 
 def uniformCostSearch(problem):
     movs = util.PriorityQueue()
