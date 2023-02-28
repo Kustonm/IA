@@ -64,7 +64,27 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        #Buscamos la distacia minima a una comida
+        minF = 9999.99
+        for food in newFood.asList():
+            dis = util.manhattanDistance(newPos, food)
+            if dis < minF: minF = dis
+        
+        # Distancia minima al fantasma
+        minG = 9999.99
+        for ghost in newGhostStates:
+            ghostP = ghost.getPosition()
+            dis = util.manhattanDistance(newPos, ghostP)
+            if dis < minG: minG = dis
+
+        #Castigar estar cerca del fantasma y sumar estar cerca de comida o capsulas
+        score = successorGameState.getScore()
+        if minG <= 1: score -= 10
+        score += 1 / (len(newFood.asList())+1)
+        score += 10 / (len(successorGameState.getCapsules())+1)
+        score += 1 / (minF+1)
+
+        return score
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -125,8 +145,26 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        '''
+        def minimax(state, depth, agentIndex):
+            if state.isWin() or state.isLose() or depth == 0:
+                return self.evaluationFunction(state), None
 
+            legalMoves = state.getLegalActions(agentIndex)
+            nextAgent = (agentIndex + 1) % state.getNumAgents()
+            # Si el agente actual es Pacman
+            if agentIndex == 0:
+                bestMove, bestValue = max([(move, minimax(state.generateSuccessor(agentIndex, move), depth, nextAgent)[0]) for move in legalMoves], key=lambda x: x[1])
+            # Si el agente actual es un fantasma
+            else:
+                bestMove, bestValue = min([(move, minimax(state.generateSuccessor(agentIndex, move), depth - 1, nextAgent)[0]) for move in legalMoves], key=lambda x: x[1])
+            return bestValue, bestMove
+
+        # Calcula el valor minimax del estado actual
+        value, move = minimax(gameState, self.depth * gameState.getNumAgents(), 0)
+
+        return move
+        '''
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
