@@ -145,6 +145,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        
         '''
         def minimax(state, depth, agentIndex):
             if state.isWin() or state.isLose() or depth == 0:
@@ -189,9 +190,28 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        def expectimax(state, depth, agent):
+            if state.isWin() or state.isLose() or depth == self.depth: 
+                return self.evaluationFunction(state), ''
+            actions = state.getLegalActions(agent)
+            if agent == 0: #Pacman
+                bestS = -9999.99
+                bestA = ''
+                for action in actions:
+                    score = expectimax(state.generateSuccessor(agent, action), depth, 1)[0]
+                    if score > bestS:
+                        bestS = score
+                        bestA = action
+                return bestS, bestA
+            else: #Fantasma
+                if len(actions) == 0: return self.evaluationFunction(state),''
+                scores = []
+                for action in actions:
+                    if agent == (gameState.getNumAgents()-1): scores.append(expectimax(state.generateSuccessor(agent, action), depth+1, 0)[0])
+                    else: scores.append(expectimax(state.generateSuccessor(agent, action), depth, agent+1)[0])
+                return sum(scores)/len(scores),''
+        return expectimax(gameState, 0, 0)[1]
+    
 def betterEvaluationFunction(currentGameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
